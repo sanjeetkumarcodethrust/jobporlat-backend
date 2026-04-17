@@ -7,7 +7,7 @@ const connectDB = async () => {
   } catch (error) {
     console.error(`Error: ${error.message}`);
     console.log('Ensure MongoDB is running locally or check your MONGO_URI in .env');
-    // process.exit(1);
+    process.exit(1);
   }
 };
 
