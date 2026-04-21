@@ -1,4 +1,4 @@
-import profileService from '../services/profileService.js';
+import * as profileService from '../services/profileService.js';
 
 // @desc    Get current user's profile
 // @route   GET /api/profile/me

@@ -10,7 +10,7 @@ import {
   uploadResume,
 } from '../controllers/profileController.js';
 import { protect } from '../middleware/authMiddleware.js';
-import { uploadResume: resumeUpload } from '../middleware/uploadMiddleware.js';
+import { uploadResume as resumeUpload } from '../middleware/uploadMiddleware.js';
 
 // All routes are protected
 router.use(protect);

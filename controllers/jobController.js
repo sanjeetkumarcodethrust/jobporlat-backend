@@ -1,4 +1,4 @@
-import jobService from '../services/jobService.js';
+import * as jobService from '../services/jobService.js';
 
 // @desc    Create a new job
 // @route   POST /api/jobs

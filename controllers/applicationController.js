@@ -1,4 +1,4 @@
-import applicationService from '../services/applicationService.js';
+import * as applicationService from '../services/applicationService.js';
 
 // @desc    Apply for a job
 // @route   POST /api/apply/:jobId

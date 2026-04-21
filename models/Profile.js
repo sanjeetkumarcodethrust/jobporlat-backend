@@ -95,4 +95,4 @@ const profileSchema = mongoose.Schema(
   }
 );
 
-export default mongoose;.model('Profile', profileSchema);
+export default mongoose.model('Profile', profileSchema);
