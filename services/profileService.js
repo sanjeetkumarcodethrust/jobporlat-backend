@@ -1,4 +1,4 @@
-const Profile = require('../models/Profile');
+import Profile from '../models/Profile.js';
 
 // Get profile by user ID
 const getProfile = async (userId) => {
@@ -147,7 +147,7 @@ const uploadResume = async (userId, filePath) => {
   return profile;
 };
 
-module.exports = {
+export { 
   getProfile,
   createOrUpdateProfile,
   addExperience,
@@ -155,4 +155,4 @@ module.exports = {
   addEducation,
   deleteEducation,
   uploadResume,
-};
+ };

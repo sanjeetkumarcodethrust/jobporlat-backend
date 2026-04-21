@@ -1,11 +1,11 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   applyToJob,
   getMyApplications,
   getJobApplications,
-} = require('../controllers/applicationController');
-const { protect, authorize } = require('../middleware/authMiddleware');
+} from '../controllers/applicationController.js';
+import { protect, authorize } from '../middleware/authMiddleware.js';
 
 // Apply for a job
 router.post('/apply/:jobId', protect, authorize('candidate'), applyToJob);
@@ -16,4 +16,4 @@ router.get('/applications/my', protect, authorize('candidate'), getMyApplication
 // Recruiter view
 router.get('/applications/job/:jobId', protect, authorize('recruiter'), getJobApplications);
 
-module.exports = router;
+export default router;

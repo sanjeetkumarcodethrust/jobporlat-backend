@@ -1,5 +1,5 @@
-const axios = require('axios');
-const Job = require('../models/Job');
+import axios from 'axios';
+import Job from '../models/Job.js';
 
 const createJob = async (jobData) => {
   return await Job.create(jobData);
@@ -52,10 +52,10 @@ const getExternalJobs = async () => {
   }
 };
 
-module.exports = {
+export { 
   createJob,
   getAllJobs,
   getJobById,
   deleteJob,
   getExternalJobs,
-};
+ };

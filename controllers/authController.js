@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -72,7 +72,7 @@ const generateToken = (id) => {
   });
 };
 
-module.exports = {
+export { 
   registerUser,
   loginUser,
-};
+ };

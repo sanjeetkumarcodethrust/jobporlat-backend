@@ -1,5 +1,5 @@
-const Application = require('../models/Application');
-const Job = require('../models/Job');
+import Application from '../models/Application.js';
+import Job from '../models/Job.js';
 
 const applyToJob = async (jobId, candidateId, resume) => {
   const job = await Job.findById(jobId);
@@ -43,8 +43,8 @@ const getApplicationsForJob = async (jobId, recruiterId) => {
     .sort('-createdAt');
 };
 
-module.exports = {
+export { 
   applyToJob,
   getMyApplications,
   getApplicationsForJob,
-};
+ };

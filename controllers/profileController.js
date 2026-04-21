@@ -1,4 +1,4 @@
-const profileService = require('../services/profileService');
+import profileService from '../services/profileService.js';
 
 // @desc    Get current user's profile
 // @route   GET /api/profile/me
@@ -141,7 +141,7 @@ const uploadResume = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export { 
   getMyProfile,
   createOrUpdateProfile,
   addExperience,
@@ -149,4 +149,4 @@ module.exports = {
   addEducation,
   deleteEducation,
   uploadResume,
-};
+ };

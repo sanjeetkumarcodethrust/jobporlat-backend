@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getMyProfile,
   createOrUpdateProfile,
   addExperience,
@@ -8,9 +8,9 @@ const {
   addEducation,
   deleteEducation,
   uploadResume,
-} = require('../controllers/profileController');
-const { protect } = require('../middleware/authMiddleware');
-const { uploadResume: resumeUpload } = require('../middleware/uploadMiddleware');
+} from '../controllers/profileController.js';
+import { protect } from '../middleware/authMiddleware.js';
+import { uploadResume: resumeUpload } from '../middleware/uploadMiddleware.js';
 
 // All routes are protected
 router.use(protect);
@@ -30,4 +30,4 @@ router.delete('/education/:eduId', deleteEducation);
 // Resume upload
 router.post('/resume', resumeUpload.single('resume'), uploadResume);
 
-module.exports = router;
+export default router;

@@ -1,9 +1,9 @@
-const express = require('express');
-const path = require('path');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const connectDB = require('./config/db');
-const { errorHandler } = require('./middleware/errorMiddleware');
+import express from 'express';
+import path from 'path';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import connectDB from './config/db.js';
+import { errorHandler } from './middleware/errorMiddleware.js';
 
 // Load environment variables
 dotenv.config();

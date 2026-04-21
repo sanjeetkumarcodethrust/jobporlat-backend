@@ -1,4 +1,4 @@
-const applicationService = require('../services/applicationService');
+import applicationService from '../services/applicationService.js';
 
 // @desc    Apply for a job
 // @route   POST /api/apply/:jobId
@@ -44,8 +44,8 @@ const getJobApplications = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export { 
   applyToJob,
   getMyApplications,
   getJobApplications,
-};
+ };

@@ -1,4 +1,4 @@
-const jobService = require('../services/jobService');
+import jobService from '../services/jobService.js';
 
 // @desc    Create a new job
 // @route   POST /api/jobs
@@ -74,10 +74,10 @@ const getExternalJobs = async (req, res, next) => {
   }
 };
 
-module.exports = {
+export { 
   createJob,
   getJobs,
   getJob,
   deleteJob,
   getExternalJobs,
-};
+ };
