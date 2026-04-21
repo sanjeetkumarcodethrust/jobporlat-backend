@@ -4,6 +4,15 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
+import { fileURLToPath } from 'url';
+
+import authRoutes from './routes/authRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import applicationRoutes from './routes/applicationRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -22,10 +31,10 @@ app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/jobs', require('./routes/jobRoutes'));
-app.use('/api', require('./routes/applicationRoutes'));
-app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api', applicationRoutes);
+app.use('/api/profile', profileRoutes);
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Welcome to the Job Portal API' });
