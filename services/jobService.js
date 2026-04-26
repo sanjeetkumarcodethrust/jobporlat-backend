@@ -5,8 +5,34 @@ const createJob = async (jobData) => {
   return await Job.create(jobData);
 };
 
-const getAllJobs = async () => {
-  return await Job.find().populate('createdBy', 'name email');
+const getAllJobs = async (filters = {}) => {
+  const query = {};
+  const andConditions = [];
+
+  if (filters.skills) {
+    andConditions.push({
+      $or: [
+        { title: { $regex: filters.skills, $options: 'i' } },
+        { description: { $regex: filters.skills, $options: 'i' } },
+        { company: { $regex: filters.skills, $options: 'i' } }
+      ]
+    });
+  }
+
+  if (filters.location) {
+    andConditions.push({ location: { $regex: filters.location, $options: 'i' } });
+  }
+
+  if (filters.experience) {
+    // No explicit experience field exists, so searching within the description
+    andConditions.push({ description: { $regex: filters.experience, $options: 'i' } });
+  }
+
+  if (andConditions.length > 0) {
+    query.$and = andConditions;
+  }
+
+  return await Job.find(query).populate('createdBy', 'name email');
 };
 
 const getJobById = async (id) => {

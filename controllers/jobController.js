@@ -27,7 +27,8 @@ const createJob = async (req, res, next) => {
 // @access  Public
 const getJobs = async (req, res, next) => {
   try {
-    const jobs = await jobService.getAllJobs();
+    const filters = req.query;
+    const jobs = await jobService.getAllJobs(filters);
     res.json(jobs);
   } catch (error) {
     next(error);
