@@ -65,6 +65,29 @@ const loginUser = async (req, res, next) => {
   }
 };
 
+// @desc    Get user profile
+// @route   GET /api/auth/me
+// @access  Private
+const getMe = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -75,4 +98,5 @@ const generateToken = (id) => {
 export { 
   registerUser,
   loginUser,
+  getMe,
  };
