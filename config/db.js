@@ -6,8 +6,8 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    console.log('Ensure MongoDB is running locally or check your MONGO_URI in .env');
-    process.exit(1);
+    console.warn('MongoDB connection failed – server will continue (development mode)');
+    // Do not exit process so the API remains reachable for front‑end testing
   }
 };
 
