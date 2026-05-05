@@ -28,7 +28,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({
   origin: ["http://localhost:5173", "http://127.0.0.1:5173", "https://jobportal-frontend-dun.vercel.app"],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -36,7 +36,7 @@ app.use(cors({
 app.options('*', cors({
   origin: ["http://localhost:5173", "http://127.0.0.1:5173", "https://jobportal-frontend-dun.vercel.app"],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
