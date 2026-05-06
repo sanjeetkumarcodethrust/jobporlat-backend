@@ -9,12 +9,14 @@ import {
 } from '../controllers/jobController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
+// Static routes first (to prevent /:id from matching them)
+router.get('/external', getExternalJobs);
+
+// Dynamic routes
 router
   .route('/')
   .get(getJobs)
   .post(protect, authorize('recruiter'), createJob);
-
-router.get('/external', getExternalJobs);
 
 router
   .route('/:id')
