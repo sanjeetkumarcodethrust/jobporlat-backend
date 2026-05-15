@@ -23,17 +23,17 @@ const protect = async (req, res, next) => {
         return next(new Error('Not authorized, user not found'));
       }
 
-      next();
+      return next();
     } catch (error) {
       console.error(error);
       res.status(401);
-      next(new Error('Not authorized'));
+      return next(new Error('Not authorized'));
     }
   }
 
   if (!token) {
     res.status(401);
-    next(new Error('Not authorized, no token'));
+    return next(new Error('Not authorized, no token'));
   }
 };
 
