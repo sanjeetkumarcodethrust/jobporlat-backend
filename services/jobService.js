@@ -14,7 +14,8 @@ const getAllJobs = async (filters = {}) => {
       $or: [
         { title: { $regex: filters.skills, $options: 'i' } },
         { description: { $regex: filters.skills, $options: 'i' } },
-        { company: { $regex: filters.skills, $options: 'i' } }
+        { company: { $regex: filters.skills, $options: 'i' } },
+        { skills: { $regex: filters.skills, $options: 'i' } }
       ]
     });
   }
@@ -24,15 +25,28 @@ const getAllJobs = async (filters = {}) => {
   }
 
   if (filters.experience) {
-    // No explicit experience field exists, so searching within the description
-    andConditions.push({ description: { $regex: filters.experience, $options: 'i' } });
+    const expArray = filters.experience.split(',');
+    const expConditions = expArray.map(exp => ({ experience: { $regex: exp, $options: 'i' } }));
+    andConditions.push({ $or: expConditions });
+  }
+
+  if (filters.jobType) {
+    const types = filters.jobType.split(',');
+    const typeConditions = types.map(t => ({ jobType: { $regex: `^${t}$`, $options: 'i' } }));
+    andConditions.push({ $or: typeConditions });
+  }
+
+  if (filters.category) {
+    const categories = filters.category.split(',');
+    const catConditions = categories.map(c => ({ category: { $regex: c, $options: 'i' } }));
+    andConditions.push({ $or: catConditions });
   }
 
   if (andConditions.length > 0) {
     query.$and = andConditions;
   }
 
-  return await Job.find(query).populate('createdBy', 'name email');
+  return await Job.find(query).sort({ postedAt: -1 }).populate('createdBy', 'name email');
 };
 
 const getJobById = async (id) => {
