@@ -73,11 +73,50 @@ const getMe = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
+      // Exclude password from the response
+      const { password, ...userProfile } = user._doc;
+      res.json(userProfile);
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.profilePicture = req.body.profilePicture !== undefined ? req.body.profilePicture : user.profilePicture;
+      user.resume = req.body.resume !== undefined ? req.body.resume : user.resume;
+      user.summary = req.body.summary !== undefined ? req.body.summary : user.summary;
+      user.about = req.body.about !== undefined ? req.body.about : user.about;
+      user.skills = req.body.skills || user.skills;
+      user.education = req.body.education || user.education;
+      user.projects = req.body.projects || user.projects;
+      user.certifications = req.body.certifications || user.certifications;
+      user.achievements = req.body.achievements || user.achievements;
+      user.hobbies = req.body.hobbies || user.hobbies;
+      user.jobPreferences = req.body.jobPreferences || user.jobPreferences;
+
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+
+      const updatedUser = await user.save();
+
+      const { password, ...userProfile } = updatedUser._doc;
+      
       res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        ...userProfile,
+        token: generateToken(updatedUser._id),
       });
     } else {
       res.status(404);
@@ -99,4 +138,5 @@ export {
   registerUser,
   loginUser,
   getMe,
+  updateProfile,
  };
