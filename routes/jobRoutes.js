@@ -4,6 +4,7 @@ import {
   createJob,
   getJobs,
   getJob,
+  updateJob,
   deleteJob,
   getExternalJobs,
 } from '../controllers/jobController.js';
@@ -21,6 +22,7 @@ router
 router
   .route('/:id')
   .get(getJob)
+  .put(protect, authorize('recruiter'), updateJob)
   .delete(protect, authorize('recruiter'), deleteJob);
 
 export default router;

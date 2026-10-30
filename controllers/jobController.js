@@ -5,7 +5,23 @@ import * as jobService from '../services/jobService.js';
 // @access  Private (Recruiter)
 const createJob = async (req, res, next) => {
   try {
-    const { title, company, location, salary, description } = req.body;
+    const {
+      title,
+      company,
+      location,
+      salary,
+      description,
+      skills,
+      experience,
+      jobType,
+      category,
+    } = req.body;
+
+    const normalizedSkills = Array.isArray(skills)
+      ? skills.map((s) => s.trim()).filter(Boolean)
+      : typeof skills === 'string'
+      ? skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
 
     const job = await jobService.createJob({
       title,
@@ -13,6 +29,10 @@ const createJob = async (req, res, next) => {
       location,
       salary,
       description,
+      skills: normalizedSkills,
+      experience: experience || 'Not specified',
+      jobType: jobType || 'Full-time',
+      category: category || 'General',
       createdBy: req.user._id,
     });
 
@@ -51,6 +71,22 @@ const getJob = async (req, res, next) => {
   }
 };
 
+// @desc    Update a job
+// @route   PUT /api/jobs/:id
+// @access  Private (Recruiter)
+const updateJob = async (req, res, next) => {
+  try {
+    const job = await jobService.updateJob(
+      req.params.id,
+      req.user._id.toString(),
+      req.body
+    );
+    res.json(job);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Delete a job
 // @route   DELETE /api/jobs/:id
 // @access  Private (Recruiter)
@@ -79,6 +115,7 @@ export {
   createJob,
   getJobs,
   getJob,
+  updateJob,
   deleteJob,
   getExternalJobs,
- };
+};

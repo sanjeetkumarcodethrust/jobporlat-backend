@@ -44,8 +44,31 @@ const getJobApplications = async (req, res, next) => {
   }
 };
 
+// @desc    Update application status
+// @route   PATCH /api/applications/:id/status
+// @access  Private (Recruiter)
+const updateApplicationStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    if (!status) {
+      res.status(400);
+      throw new Error('Please provide a new status (applied, shortlisted, rejected)');
+    }
+
+    const application = await applicationService.updateApplicationStatus(
+      req.params.id,
+      req.user._id.toString(),
+      status
+    );
+    res.json(application);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export { 
   applyToJob,
   getMyApplications,
   getJobApplications,
- };
+  updateApplicationStatus,
+};

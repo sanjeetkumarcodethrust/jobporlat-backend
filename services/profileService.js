@@ -1,4 +1,5 @@
 import Profile from '../models/Profile.js';
+import User from '../models/User.js';
 
 // Get profile by user ID
 const getProfile = async (userId) => {
@@ -143,6 +144,9 @@ const uploadResume = async (userId, filePath) => {
     profile.resumeUrl = filePath;
     await profile.save();
   }
+
+  // Also synchronize with User model resume field
+  await User.findByIdAndUpdate(userId, { resume: filePath });
 
   return profile;
 };

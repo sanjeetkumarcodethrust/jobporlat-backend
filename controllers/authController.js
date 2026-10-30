@@ -73,8 +73,9 @@ const getMe = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-      // Exclude password from the response
-      const { password, ...userProfile } = user._doc;
+      // Exclude password from the response cleanly using toObject
+      const userProfile = user.toObject();
+      delete userProfile.password;
       res.json(userProfile);
     } else {
       res.status(404);
@@ -98,21 +99,29 @@ const updateProfile = async (req, res, next) => {
       user.resume = req.body.resume !== undefined ? req.body.resume : user.resume;
       user.summary = req.body.summary !== undefined ? req.body.summary : user.summary;
       user.about = req.body.about !== undefined ? req.body.about : user.about;
-      user.skills = req.body.skills || user.skills;
-      user.education = req.body.education || user.education;
-      user.projects = req.body.projects || user.projects;
-      user.certifications = req.body.certifications || user.certifications;
-      user.achievements = req.body.achievements || user.achievements;
-      user.hobbies = req.body.hobbies || user.hobbies;
-      user.jobPreferences = req.body.jobPreferences || user.jobPreferences;
+
+      if (req.body.skills !== undefined) {
+        if (typeof req.body.skills === 'string') {
+          user.skills = req.body.skills.split(',').map((s) => s.trim()).filter(Boolean);
+        } else if (Array.isArray(req.body.skills)) {
+          user.skills = req.body.skills;
+        }
+      }
+
+      user.education = req.body.education !== undefined ? req.body.education : user.education;
+      user.projects = req.body.projects !== undefined ? req.body.projects : user.projects;
+      user.certifications = req.body.certifications !== undefined ? req.body.certifications : user.certifications;
+      user.achievements = req.body.achievements !== undefined ? req.body.achievements : user.achievements;
+      user.hobbies = req.body.hobbies !== undefined ? req.body.hobbies : user.hobbies;
+      user.jobPreferences = req.body.jobPreferences !== undefined ? req.body.jobPreferences : user.jobPreferences;
 
       if (req.body.password) {
         user.password = req.body.password;
       }
 
       const updatedUser = await user.save();
-
-      const { password, ...userProfile } = updatedUser._doc;
+      const userProfile = updatedUser.toObject();
+      delete userProfile.password;
       
       res.json({
         ...userProfile,
