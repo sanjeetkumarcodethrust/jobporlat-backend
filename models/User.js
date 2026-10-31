@@ -6,12 +6,14 @@ const userSchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Please add a name'],
+      trim: true,
     },
     email: {
       type: String,
       required: [true, 'Please add an email'],
       unique: true,
       lowercase: true,
+      trim: true,
     },
     password: {
       type: String,
@@ -21,6 +23,8 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: ['candidate', 'recruiter'],
       default: 'candidate',
+      lowercase: true,
+      trim: true,
     },
     // Extended Profile Fields
     profilePicture: { type: String, default: '' },

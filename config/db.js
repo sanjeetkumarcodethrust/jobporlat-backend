@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import dns from 'dns';
 
-const connectDB = async () => {
+const connectDB = async (retries = 5, delay = 3000) => {
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
@@ -9,8 +9,9 @@ const connectDB = async () => {
     return;
   }
 
-  // Resolve SRV lookups reliably on Windows networks by using Google & Cloudflare DNS
-  if (uri.startsWith('mongodb+srv://')) {
+  // Windows network fix for mongodb+srv DNS SRV query failures
+  // Only apply on Windows; do NOT override on Linux/Render where container DNS is required
+  if (uri.startsWith('mongodb+srv://') && process.platform === 'win32') {
     try {
       dns.setServers(['8.8.8.8', '1.1.1.1']);
     } catch {
@@ -18,20 +19,42 @@ const connectDB = async () => {
     }
   }
 
-  try {
-    const conn = await mongoose.connect(uri);
-    console.log(`MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
-  } catch (error) {
-    console.error(`MongoDB Connection Error: ${error.message}`);
-    if (error.message.toLowerCase().includes('bad auth') || error.message.toLowerCase().includes('authentication failed')) {
-      console.error('Hint: Authentication failed. Please check the MongoDB username and password in .env, or reset the password in MongoDB Atlas (Security -> Database Access).');
-    } else if (error.message.includes('querySrv') || error.message.includes('ENOTFOUND') || error.message.includes('ECONNREFUSED')) {
-      console.error('Hint: Network or DNS error. Ensure your IP is whitelisted in MongoDB Atlas (Network Access -> Add IP Address -> Allow Access from Anywhere 0.0.0.0/0).');
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const conn = await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 10000,
+      });
+      console.log(`MongoDB Connected: ${conn.connection.host}/${conn.connection.name}`);
+      return conn;
+    } catch (error) {
+      console.error(`MongoDB Connection Attempt ${attempt}/${retries} failed: ${error.message}`);
+      if (attempt < retries) {
+        console.log(`Retrying MongoDB connection in ${delay / 1000}s...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      } else {
+        if (
+          error.message.toLowerCase().includes('bad auth') ||
+          error.message.toLowerCase().includes('authentication failed')
+        ) {
+          console.error('Hint: Authentication failed. Please verify the username and password in MONGO_URI.');
+        } else if (
+          error.message.includes('querySrv') ||
+          error.message.includes('ENOTFOUND') ||
+          error.message.includes('ECONNREFUSED')
+        ) {
+          console.error('Hint: Network or DNS error. Ensure your IP is whitelisted (0.0.0.0/0) in MongoDB Atlas Network Access.');
+        }
+      }
     }
-    console.warn('MongoDB connection failed – server will continue (development mode)');
   }
 };
 
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('MongoDB reconnected');
+});
+
 export default connectDB;
-
-

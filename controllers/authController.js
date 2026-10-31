@@ -8,7 +8,13 @@ const registerUser = async (req, res, next) => {
   try {
     const { name, email, password, role } = req.body;
 
-    const userExists = await User.findOne({ email });
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error('Please provide name, email, and password');
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const userExists = await User.findOne({ email: cleanEmail });
 
     if (userExists) {
       res.status(400);
@@ -16,10 +22,10 @@ const registerUser = async (req, res, next) => {
     }
 
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: cleanEmail,
       password,
-      role,
+      role: role ? role.toLowerCase().trim() : 'candidate',
     });
 
     if (user) {
@@ -46,7 +52,13 @@ const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!email || !password) {
+      res.status(400);
+      throw new Error('Please provide email and password');
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: cleanEmail });
 
     if (user && (await user.matchPassword(password))) {
       res.json({
@@ -73,7 +85,6 @@ const getMe = async (req, res, next) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-      // Exclude password from the response cleanly using toObject
       const userProfile = user.toObject();
       delete userProfile.password;
       res.json(userProfile);
@@ -148,4 +159,4 @@ export {
   loginUser,
   getMe,
   updateProfile,
- };
+};

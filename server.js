@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 import cors from 'cors';
+import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 import { fileURLToPath } from 'url';
@@ -57,6 +58,17 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api', applicationRoutes);
 app.use('/api/profile', profileRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  const isConnected = mongoose.connection.readyState === 1;
+  res.status(isConnected ? 200 : 503).json({
+    status: isConnected ? 'healthy' : 'database_disconnected',
+    database: isConnected ? 'connected' : 'disconnected',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get('/', (req, res) => {
   res.status(200).json({ message: 'Welcome to the Job Portal API', status: 'running' });

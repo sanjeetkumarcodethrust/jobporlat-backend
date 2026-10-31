@@ -1,9 +1,14 @@
+import mongoose from 'mongoose';
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import User from '../models/User.js';
 import Profile from '../models/Profile.js';
 
 const applyToJob = async (jobId, candidateId, resume) => {
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    throw new Error('Job not found');
+  }
+
   const job = await Job.findById(jobId);
   if (!job) {
     throw new Error('Job not found');
@@ -47,6 +52,10 @@ const getMyApplications = async (candidateId) => {
 };
 
 const getApplicationsForJob = async (jobId, recruiterId) => {
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    throw new Error('Job not found');
+  }
+
   const job = await Job.findById(jobId);
   
   if (!job) {
@@ -64,6 +73,10 @@ const getApplicationsForJob = async (jobId, recruiterId) => {
 };
 
 const updateApplicationStatus = async (applicationId, recruiterId, status) => {
+  if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+    throw new Error('Application not found');
+  }
+
   const application = await Application.findById(applicationId).populate('jobId');
   if (!application) {
     throw new Error('Application not found');
