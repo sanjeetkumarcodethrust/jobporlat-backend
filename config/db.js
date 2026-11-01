@@ -1,19 +1,33 @@
 import mongoose from 'mongoose';
 import dns from 'dns';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
+
+// Ensure Node 17+ resolves IPv4 first to prevent timeout/hangs with MongoDB Atlas on Windows
+try {
+  dns.setDefaultResultOrder('ipv4first');
+} catch {
+  // Ignore if not supported in this runtime
+}
 
 const connectDB = async (retries = 5, delay = 3000) => {
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
     console.error('MongoDB Error: MONGO_URI environment variable is not defined in .env');
-    return;
+    return null;
   }
 
   // Windows network fix for mongodb+srv DNS SRV query failures
   // Only apply on Windows; do NOT override on Linux/Render where container DNS is required
   if (uri.startsWith('mongodb+srv://') && process.platform === 'win32') {
     try {
-      dns.setServers(['8.8.8.8', '1.1.1.1']);
+      dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1', '1.0.0.1']);
     } catch {
       // Ignore if setting DNS servers fails
     }
@@ -47,6 +61,8 @@ const connectDB = async (retries = 5, delay = 3000) => {
       }
     }
   }
+
+  return null;
 };
 
 mongoose.connection.on('disconnected', () => {
