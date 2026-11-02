@@ -24,17 +24,19 @@ const errorHandler = (err, req, res, next) => {
     message = 'Not authorized, token expired';
   } else if (err instanceof multer.MulterError) {
     statusCode = 400;
-  } else if (message.toLowerCase().includes('not found')) {
-    statusCode = 404;
-  } else if (message.toLowerCase().includes('not authorized') || message.toLowerCase().includes('unauthorized')) {
-    statusCode = 403;
-  } else if (
-    message.toLowerCase().includes('already applied') ||
-    message.toLowerCase().includes('already exists') ||
-    message.toLowerCase().includes('invalid') ||
-    message.toLowerCase().includes('please provide')
-  ) {
-    statusCode = 400;
+  } else if (statusCode === 500) {
+    if (message.toLowerCase().includes('not found')) {
+      statusCode = 404;
+    } else if (message.toLowerCase().includes('not authorized') || message.toLowerCase().includes('unauthorized')) {
+      statusCode = 403;
+    } else if (
+      message.toLowerCase().includes('already applied') ||
+      message.toLowerCase().includes('already exists') ||
+      message.toLowerCase().includes('invalid') ||
+      message.toLowerCase().includes('please provide')
+    ) {
+      statusCode = 400;
+    }
   }
 
   res.status(statusCode).json({

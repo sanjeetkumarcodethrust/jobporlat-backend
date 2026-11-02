@@ -60,18 +60,24 @@ const loginUser = async (req, res, next) => {
     const cleanEmail = email.toLowerCase().trim();
     const user = await User.findOne({ email: cleanEmail });
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        token: generateToken(user._id),
-      });
-    } else {
+    if (!user) {
       res.status(401);
-      throw new Error('Invalid email or password');
+      throw new Error('No account found with this email. Please register first.');
     }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      res.status(401);
+      throw new Error('Incorrect password. Please try again.');
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      token: generateToken(user._id),
+    });
   } catch (error) {
     next(error);
   }
