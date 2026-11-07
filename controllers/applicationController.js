@@ -19,9 +19,13 @@ const applyToJob = async (req, res, next) => {
 
 // @desc    Get my applications
 // @route   GET /api/applications/my
-// @access  Private (Candidate)
+// @access  Private
 const getMyApplications = async (req, res, next) => {
   try {
+    if (req.user.role === 'recruiter') {
+      const applications = await applicationService.getRecruiterApplications(req.user._id);
+      return res.json(applications);
+    }
     const applications = await applicationService.getMyApplications(req.user._id);
     res.json(applications);
   } catch (error) {

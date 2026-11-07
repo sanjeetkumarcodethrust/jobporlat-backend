@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import './Job.js';
+import './User.js';
 
 const applicationSchema = mongoose.Schema(
   {

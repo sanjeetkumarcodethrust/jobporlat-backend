@@ -51,6 +51,15 @@ const getMyApplications = async (candidateId) => {
     .sort('-createdAt');
 };
 
+const getRecruiterApplications = async (recruiterId) => {
+  const myJobs = await Job.find({ createdBy: recruiterId }).select('_id');
+  const jobIds = myJobs.map((j) => j._id);
+  return await Application.find({ jobId: { $in: jobIds } })
+    .populate('jobId', 'title company location salary jobType')
+    .populate('candidateId', 'name email profilePicture resume summary skills')
+    .sort('-createdAt');
+};
+
 const getApplicationsForJob = async (jobId, recruiterId) => {
   if (!mongoose.Types.ObjectId.isValid(jobId)) {
     throw new Error('Job not found');
@@ -99,6 +108,7 @@ const updateApplicationStatus = async (applicationId, recruiterId, status) => {
 export { 
   applyToJob,
   getMyApplications,
+  getRecruiterApplications,
   getApplicationsForJob,
   updateApplicationStatus,
 };
