@@ -112,6 +112,8 @@ const updateProfile = async (req, res, next) => {
 
     if (user) {
       user.name = req.body.name || user.name;
+      user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
+      user.address = req.body.address !== undefined ? req.body.address : user.address;
       user.profilePicture = req.body.profilePicture !== undefined ? req.body.profilePicture : user.profilePicture;
       user.resume = req.body.resume !== undefined ? req.body.resume : user.resume;
       user.summary = req.body.summary !== undefined ? req.body.summary : user.summary;

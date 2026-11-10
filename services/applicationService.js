@@ -4,7 +4,7 @@ import Job from '../models/Job.js';
 import User from '../models/User.js';
 import Profile from '../models/Profile.js';
 
-const applyToJob = async (jobId, candidateId, resume) => {
+const applyToJob = async (jobId, candidateId, applicationData = {}) => {
   if (!mongoose.Types.ObjectId.isValid(jobId)) {
     throw new Error('Job not found');
   }
@@ -20,34 +20,81 @@ const applyToJob = async (jobId, candidateId, resume) => {
     throw new Error('You have already applied for this job');
   }
 
-  // Resume fallback if not explicitly provided in request body
-  let finalResume = resume;
+  // Normalize input data
+  const data = typeof applicationData === 'string' ? { resume: applicationData } : applicationData;
+
+  const candidate = await User.findById(candidateId);
+  const profile = await Profile.findOne({ user: candidateId });
+
+  // Resolve Resume
+  let finalResume = data.resume?.trim();
   if (!finalResume) {
-    const candidate = await User.findById(candidateId);
     if (candidate && candidate.resume) {
       finalResume = candidate.resume;
-    } else {
-      const profile = await Profile.findOne({ user: candidateId });
-      if (profile && profile.resumeUrl) {
-        finalResume = profile.resumeUrl;
-      }
+    } else if (profile && profile.resumeUrl) {
+      finalResume = profile.resumeUrl;
     }
   }
 
   if (!finalResume) {
-    throw new Error('Please provide a resume URL or upload one to your profile before applying');
+    throw new Error('Please provide your resume URL or upload one to your profile before applying');
+  }
+
+  // Resolve Full Name
+  const finalFullName = data.fullName?.trim() || candidate?.name || 'Applicant';
+
+  // Resolve Email
+  const finalEmail = data.email?.trim() || candidate?.email || '';
+
+  // Resolve Mobile/Phone
+  const finalPhone = data.phone?.trim() || candidate?.phone || profile?.phone || '';
+
+  // Resolve Address
+  const finalAddress = data.address?.trim() || candidate?.address || profile?.location || '';
+
+  const finalCoverNote = data.coverNote?.trim() || '';
+  const finalExperience = data.experience?.trim() || '';
+
+  // Sync phone, address, resume to User document if not already set
+  if (candidate) {
+    let shouldSaveUser = false;
+    if (finalPhone && !candidate.phone) {
+      candidate.phone = finalPhone;
+      shouldSaveUser = true;
+    }
+    if (finalAddress && !candidate.address) {
+      candidate.address = finalAddress;
+      shouldSaveUser = true;
+    }
+    if (finalResume && !candidate.resume) {
+      candidate.resume = finalResume;
+      shouldSaveUser = true;
+    }
+    if (shouldSaveUser) {
+      try {
+        await candidate.save();
+      } catch (err) {
+        console.error('Non-critical: could not sync user phone/address:', err.message);
+      }
+    }
   }
 
   return await Application.create({
     jobId,
     candidateId,
     resume: finalResume,
+    fullName: finalFullName,
+    email: finalEmail,
+    phone: finalPhone,
+    address: finalAddress,
+    coverNote: finalCoverNote,
+    experience: finalExperience,
   });
 };
 
 const getMyApplications = async (candidateId) => {
   return await Application.find({ candidateId })
-    .populate('jobId', 'title company location salary jobType')
+    .populate('jobId', 'title company location salary jobType category description')
     .sort('-createdAt');
 };
 
@@ -56,7 +103,7 @@ const getRecruiterApplications = async (recruiterId) => {
   const jobIds = myJobs.map((j) => j._id);
   return await Application.find({ jobId: { $in: jobIds } })
     .populate('jobId', 'title company location salary jobType')
-    .populate('candidateId', 'name email profilePicture resume summary skills')
+    .populate('candidateId', 'name email profilePicture resume summary skills phone address')
     .sort('-createdAt');
 };
 
@@ -77,7 +124,7 @@ const getApplicationsForJob = async (jobId, recruiterId) => {
   }
 
   return await Application.find({ jobId })
-    .populate('candidateId', 'name email profilePicture resume summary skills')
+    .populate('candidateId', 'name email profilePicture resume summary skills phone address')
     .sort('-createdAt');
 };
 

@@ -17,6 +17,38 @@ const applicationSchema = mongoose.Schema(
     resume: {
       type: String,
       required: [true, 'Please provide a resume'],
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: '',
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    coverNote: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    experience: {
+      type: String,
+      trim: true,
+      default: '',
     },
     status: {
       type: String,

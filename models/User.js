@@ -27,6 +27,8 @@ const userSchema = mongoose.Schema(
       trim: true,
     },
     // Extended Profile Fields
+    phone: { type: String, default: '', trim: true },
+    address: { type: String, default: '', trim: true },
     profilePicture: { type: String, default: '' },
     resume: { type: String, default: '' },
     summary: { type: String, default: '' },

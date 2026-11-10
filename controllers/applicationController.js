@@ -5,11 +5,11 @@ import * as applicationService from '../services/applicationService.js';
 // @access  Private (Candidate)
 const applyToJob = async (req, res, next) => {
   try {
-    const { resume } = req.body;
+    const { resume, fullName, email, phone, address, coverNote, experience } = req.body;
     const application = await applicationService.applyToJob(
       req.params.jobId,
       req.user._id,
-      resume
+      { resume, fullName, email, phone, address, coverNote, experience }
     );
     res.status(201).json(application);
   } catch (error) {
