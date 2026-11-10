@@ -282,7 +282,7 @@ const getAllJobs = async (filters = {}) => {
       }
     }
 
-    if (f.company && !keyword) {
+    if (f.company) {
       const safeCompany = escapeRegex(f.company);
       if (safeCompany) {
         andConditions.push({ company: { $regex: safeCompany, $options: 'i' } });
@@ -319,6 +319,12 @@ const getAllJobs = async (filters = {}) => {
   // 3. Fallback for location alone if keyword was empty but location + experience returned 0
   if (jobs.length === 0 && !keyword && filters.location && filters.experience) {
     const relaxedQ = buildQuery({ location: filters.location });
+    jobs = await Job.find(relaxedQ).sort({ postedAt: -1 }).populate('createdBy', 'name email');
+  }
+
+  // 4. Fallback for company alone if combined filters returned 0
+  if (jobs.length === 0 && filters.company) {
+    const relaxedQ = buildQuery({ company: filters.company });
     jobs = await Job.find(relaxedQ).sort({ postedAt: -1 }).populate('createdBy', 'name email');
   }
 
